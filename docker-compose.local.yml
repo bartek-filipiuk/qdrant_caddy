@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "127.0.0.1:8081:6333"
+    environment:
+      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY}
+      - QDRANT__SERVICE__ALLOW_API_KEY_INSECURE=true
+      - QDRANT__SERVICE__HTTP_ALLOW_ORIGIN="*"
+      - QDRANT__SERVICE__ENABLE_TLS=false
+    volumes:
+      - local_qdrant_storage:/qdrant/storage
+    networks:
+      - qdrant_network
+
+  # Caddy removed for direct access to Qdrant
+
+networks:
+  qdrant_network:
+    driver: bridge
+
+volumes:
+  local_qdrant_storage:

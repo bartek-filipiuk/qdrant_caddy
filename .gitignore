@@ -1,0 +1,16 @@
+# Zmienne środowiskowe
+.env
+
+# Katalogi danych
+qdrant_storage/
+
+# Katalog backupów
+backup/
+
+# Pliki tymczasowe
+*.tmp
+*.log
+
+# Pliki systemowe
+.DS_Store
+Thumbs.db

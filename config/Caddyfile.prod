@@ -1,0 +1,28 @@
+{$DOMAIN} {
+    # TLS with automatic HTTPS
+    tls internal
+
+    # Basic Auth for all routes
+    basic_auth {
+        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
+    }
+
+    # Simple reverse proxy for all routes
+    reverse_proxy qdrant:6333 {
+        # Forward API key in the correct format
+        header_up api-key {http.request.header.X-API-KEY}
+        # Enable streaming for better performance
+        transport http {
+            response_header_timeout 5m
+            read_timeout 5m
+            write_timeout 5m
+        }
+    }
+    
+    # Logging
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}
