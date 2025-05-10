@@ -1,62 +1,62 @@
 # Qdrant Vector Database
 
-Konfiguracja Qdrant z obsługą API key i HTTPS dla środowisk lokalnych i produkcyjnych.
+Qdrant configuration with API key and HTTPS support for local and production environments.
 
-## Opis
+## Description
 
-Repozytorium zawiera gotową konfigurację Qdrant - wydajnej bazy danych wektorowych, z następującymi funkcjonalnościami:
+This repository contains a ready-to-use configuration for Qdrant - an efficient vector database, with the following features:
 
-- Środowisko lokalne z bezpośrednim dostępem do Qdrant
-- Środowisko produkcyjne z Caddy jako reverse proxy (HTTPS, Basic Auth)
-- Uwierzytelnianie za pomocą klucza API
-- Skrypty do zarządzania (start, stop, restart)
-- Automatyczne uzyskiwanie certyfikatów SSL w środowisku produkcyjnym
+- Local environment with direct access to Qdrant
+- Production environment with Caddy as a reverse proxy (HTTPS, Basic Auth)
+- API key authentication
+- Management scripts (start, stop, restart)
+- Automatic SSL certificate acquisition in production environment
 
-## Wymagania
+## Requirements
 
-- Docker i Docker Compose
+- Docker and Docker Compose
 - Bash
 
-## Szybki start
+## Quick Start
 
-1. Skopiuj `.env.example` do `.env` i dostosuj zmienne:
+1. Copy `.env.example` to `.env` and adjust variables:
    ```bash
    cp .env.example .env
    ```
 
-2. Uruchom Qdrant lokalnie:
+2. Start Qdrant locally:
    ```bash
    ./start.sh
    ```
 
-3. Dostęp do dashboardu:
+3. Access the dashboard:
    ```
    http://localhost:8081/dashboard
    ```
    
-4. Użyj klucza API z pliku `.env` do uwierzytelniania zapytań.
+4. Use the API key from the `.env` file to authenticate requests.
 
-## Struktura projektu
+## Project Structure
 
-- `config/` - Pliki konfiguracyjne (Caddyfile)
-- `scripts/` - Skrypty do zarządzania i konfiguracji
-- `docs/` - Dokumentacja
-- `docker-compose.local.yml` - Konfiguracja dla środowiska lokalnego
-- `docker-compose.prod.yml` - Konfiguracja dla środowiska produkcyjnego
+- `config/` - Configuration files (Caddyfile)
+- `scripts/` - Management and configuration scripts
+- `docs/` - Documentation
+- `docker-compose.local.yml` - Configuration for local environment
+- `docker-compose.prod.yml` - Configuration for production environment
 
-## Wdrożenie produkcyjne
+## Production Deployment
 
-Aby wdrożyć na produkcji:
+To deploy to production:
 
-1. Ustaw zmienną `DOMAIN` w pliku `.env`
-2. Uruchom skrypt konfiguracji domeny:
+1. Set the `DOMAIN` variable in the `.env` file
+2. Run the domain setup script:
    ```bash
    sudo ./scripts/setup-domain.sh
    ```
 
-Szczegółowe instrukcje znajdują się w `docs/DEPLOYMENT.md`.
+Detailed instructions can be found in `docs/DEPLOYMENT.md`.
 
-## Dokumentacja
+## Documentation
 
-- `docs/Troubleshooting.md` - Rozwiązywanie problemów
-- `docs/Tutorial korzystania z API Qdrant.md` - Przykłady użycia API
+- `docs/Troubleshooting.md` - Troubleshooting guide
+- `docs/Tutorial korzystania z API Qdrant.md` - API usage examples
