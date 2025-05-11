@@ -1,6 +1,14 @@
 {$DOMAIN} {
-    # TLS with automatic HTTPS using Let's Encrypt
-    tls {$ADMIN_EMAIL}
+    # TLS with automatic HTTPS using Let's Encrypt with HTTP-01 challenge
+    tls {
+        issuer acme {
+            email {$ADMIN_EMAIL}
+            preferred_chains smallest
+            resolvers 1.1.1.1
+            # Force HTTP-01 challenge instead of TLS-ALPN-01
+            disable_tlsalpn_challenge
+        }
+    }
 
     # Basic Auth for all routes
     basic_auth {
