@@ -6,8 +6,6 @@
             preferred_chains smallest
             # Disable TLS-ALPN challenge, forcing HTTP-01 only
             disable_tlsalpn_challenge
-            # Use alternate port for HTTP challenge
-            alt_http_port 8080
         }
     }
 
