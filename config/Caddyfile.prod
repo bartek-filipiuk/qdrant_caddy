@@ -1,6 +1,6 @@
 {$DOMAIN} {
-    # TLS with automatic HTTPS
-    tls internal
+    # TLS with automatic HTTPS using Let's Encrypt
+    tls {$ADMIN_EMAIL}
 
     # Basic Auth for all routes
     basic_auth {

@@ -33,6 +33,7 @@ services:
       - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
       - QDRANT_API_KEY=${QDRANT_API_KEY}
       - DOMAIN=${DOMAIN}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
     restart: unless-stopped
 
 networks:

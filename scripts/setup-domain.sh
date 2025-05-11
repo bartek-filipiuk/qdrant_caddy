@@ -13,6 +13,20 @@ if [ -z "$DOMAIN" ]; then
     exit 1
 fi
 
+# Check if ADMIN_EMAIL is set (needed for Let's Encrypt)
+if [ -z "$ADMIN_EMAIL" ]; then
+    echo "ADMIN_EMAIL is not set in .env file. This is needed for Let's Encrypt certificates."
+    echo "Please enter an email address for Let's Encrypt notifications:"
+    read -r ADMIN_EMAIL
+    
+    # Add ADMIN_EMAIL to .env file
+    if grep -q "ADMIN_EMAIL=" ../.env; then
+        sed -i "s|ADMIN_EMAIL=.*|ADMIN_EMAIL=$ADMIN_EMAIL|" ../.env
+    else
+        echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> ../.env
+    fi
+fi
+
 echo "=== Setting up domain for Qdrant with Caddy ==="
 echo "Domain: $DOMAIN"
 
@@ -61,11 +75,11 @@ echo "Generated hash: $PASSWORD_HASH"
 # Update .env file with password hash
 echo "Updating .env file with password hash..."
 if grep -q "ADMIN_PASSWORD_HASH=" ../.env; then
-    # Update existing hash
-    sed -i "s|ADMIN_PASSWORD_HASH=.*|ADMIN_PASSWORD_HASH=$PASSWORD_HASH|" ../.env
+    # Update existing hash - use double quotes to preserve the hash format with special characters
+    sed -i "s|ADMIN_PASSWORD_HASH=.*|ADMIN_PASSWORD_HASH=\"$PASSWORD_HASH\"|" ../.env
 else
-    # Add hash if it doesn't exist
-    echo "ADMIN_PASSWORD_HASH=$PASSWORD_HASH" >> ../.env
+    # Add hash if it doesn't exist - use double quotes to preserve the hash format with special characters
+    echo "ADMIN_PASSWORD_HASH=\"$PASSWORD_HASH\"" >> ../.env
 fi
 
 # Start production environment
