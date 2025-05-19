@@ -3,6 +3,7 @@
 
 # Katalogi danych
 qdrant_storage/
+snapshots
 
 # Katalog backupów
 backup/

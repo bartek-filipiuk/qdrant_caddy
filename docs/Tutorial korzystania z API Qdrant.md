@@ -56,19 +56,23 @@ Qdrant obsługuje autoryzację opartą na kluczach API, aby zabezpieczyć instan
 Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono kluczowe endpointy, ich funkcjonalność oraz przykłady komend curl.
 
 ### 1. Tworzenie kolekcji
-- **Endpoint**: `POST /collections`
+- **Endpoint**: `PUT /collections/{collection_name}`
 - **Opis**: Tworzy nową kolekcję do przechowywania wektorów.
 - **Przykład**:
   ```bash
-  curl -X PUT 'http://localhost:8080/collections/moja_kolekcja' \
+  curl -X PUT 'https://quadro.run/collections/moja_kolekcja' \
     -u admin:haslo123 \
     -H 'Content-Type: application/json' \
-    -H 'X-API-KEY: tajny_klucz_123' \
+    -H 'api-key: tajny_klucz_123' \
     -d '{
       "vectors": {
         "size": 128,
         "distance": "Cosine"
-      }
+      },
+      "optimizers_config": {
+        "default_segment_number": 2
+      },
+      "on_disk_payload": true
     }'
   ```
 - **Wyjaśnienie**:
@@ -81,10 +85,10 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
 - **Opis**: Dodaje lub aktualizuje punkty (wektory z opcjonalnym payloadem) w kolekcji.
 - **Przykład**:
   ```bash
-  curl -X PUT 'http://localhost:8080/collections/moja_kolekcja/points' \
+  curl -X PUT 'https://quadro.run/collections/moja_kolekcja/points' \
     -u admin:haslo123 \
     -H 'Content-Type: application/json' \
-    -H 'X-API-KEY: tajny_klucz_123' \
+    -H 'api-key: tajny_klucz_123' \
     -d '{
       "points": [
         {
@@ -110,10 +114,10 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
 - **Opis**: Wyszukuje punkty podobne do podanego wektora.
 - **Przykład**:
   ```bash
-  curl -X POST 'http://localhost:8080/collections/moja_kolekcja/points/search' \
+  curl -X POST 'https://quadro.run/collections/moja_kolekcja/points/search' \
     -u admin:haslo123 \
     -H 'Content-Type: application/json' \
-    -H 'X-API-KEY: tajny_klucz_123' \
+    -H 'api-key: tajny_klucz_123' \
     -d '{
       "vector": [0.2, 0.3, 0.4, 0.5],
       "limit": 10
@@ -128,10 +132,10 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
 - **Opis**: Zwraca informacje o kolekcji.
 - **Przykład**:
   ```bash
-  curl -X GET 'http://localhost:8080/collections/moja_kolekcja' \
+  curl -X GET 'https://quadro.run/collections/moja_kolekcja' \
     -u admin:haslo123 \
     -H 'Content-Type: application/json' \
-    -H 'X-API-KEY: tajny_klucz_123'
+    -H 'api-key: tajny_klucz_123'
   ```
 
 ### 5. Usuwanie kolekcji
@@ -139,10 +143,10 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
 - **Opis**: Usuwa kolekcję i wszystkie jej punkty.
 - **Przykład**:
   ```bash
-  curl -X DELETE 'http://localhost:8080/collections/moja_kolekcja' \
+  curl -X DELETE 'https://quadro.run/collections/moja_kolekcja' \
     -u admin:haslo123 \
     -H 'Content-Type: application/json' \
-    -H 'X-API-KEY: tajny_klucz_123'
+    -H 'api-key: tajny_klucz_123'
   ```
 
 ### 6. Lista migawek
@@ -150,10 +154,10 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
 - **Opis**: Wyświetla wszystkie dostępne migawki dla kolekcji.
 - **Przykład**:
   ```bash
-  curl -X GET 'http://localhost:8080/snapshots' \
+  curl -X GET 'https://quadro.run/snapshots' \
     -u admin:haslo123 \
     -H 'Content-Type: application/json' \
-    -H 'X-API-KEY: tajny_klucz_123'
+    -H 'api-key: tajny_klucz_123'
   ```
 
 ### 7. Tworzenie klucza shard (dla trybu rozproszonego)
@@ -161,7 +165,7 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
 - **Opis**: Tworzy klucz shard dla wdrożeń rozproszonych.
 - **Przykład**:
   ```bash
-  curl -X POST 'http://localhost:6333/distributed/shard-key' \
+  curl -X POST 'https://quadro.run/distributed/shard-key' \
     -H 'Content-Type: application/json' \
     -H 'api-key: twój_tajny_klucz_api' \
     -d '{
@@ -196,8 +200,114 @@ Qdrant oferuje REST API do interakcji z bazą danych. Poniżej przedstawiono klu
   - Pełna lista endpointów i szczegółowa dokumentacja są dostępne w [Qdrant API Reference](https://api.qdrant.tech/v-1-13-x/api-reference).
   - Możesz również przejrzeć specyfikację OpenAPI w [OpenAPI JSON](https://github.com/qdrant/qdrant/blob/master/docs/redoc/master/openapi.json).
 
+## Przykład praktyczny: Kolekcja transkrypcji YouTube
+
+Poniżej przedstawiamy kompletny przykład utworzenia kolekcji do przechowywania transkrypcji filmów z YouTube oraz dodania przykładowego punktu.
+
+### 1. Utworzenie kolekcji dla transkrypcji YouTube
+
+```bash
+curl -X PUT 'https://quadro.run/collections/youtube_transcripts' \
+  -u admin:I8GXa8NzFbdP720f \
+  -H 'Content-Type: application/json' \
+  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -d '{
+    "vectors": {
+      "size": 1536,
+      "distance": "Cosine"
+    },
+    "optimizers_config": {
+      "default_segment_number": 2
+    },
+    "on_disk_payload": true
+  }'
+```
+
+### 2. Dodanie przykładowego punktu z transkrypcją
+
+```bash
+curl -X PUT 'https://quadro.run/collections/youtube_transcripts/points' \
+  -u admin:I8GXa8NzFbdP720f \
+  -H 'Content-Type: application/json' \
+  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -d '{
+    "points": [
+      {
+        "id": 1,
+        "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
+        "payload": {
+          "video_id": "dQw4w9WgXcQ",
+          "title": "Rick Astley - Never Gonna Give You Up",
+          "channel": "Rick Astley",
+          "publish_date": "2009-10-25",
+          "transcript": "We are no strangers to love. You know the rules and so do I...",
+          "timestamp": "00:00:15",
+          "duration": "3:32",
+          "language": "en",
+          "category": "Music",
+          "tags": ["80s", "pop", "rick roll"]
+        }
+      }
+    ]
+  }'
+```
+
+### 3. Wyszukiwanie podobnych transkrypcji
+
+```bash
+curl -X POST 'https://quadro.run/collections/youtube_transcripts/points/search' \
+  -u admin:I8GXa8NzFbdP720f \
+  -H 'Content-Type: application/json' \
+  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -d '{
+    "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
+    "limit": 5,
+    "filter": {
+      "must": [
+        {
+          "key": "language",
+          "match": {
+            "value": "en"
+          }
+        }
+      ]
+    }
+  }'
+```
+
+### 4. Wyszukiwanie z filtrowaniem po metadanych
+
+```bash
+curl -X POST 'https://quadro.run/collections/youtube_transcripts/points/search' \
+  -u admin:I8GXa8NzFbdP720f \
+  -H 'Content-Type: application/json' \
+  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -d '{
+    "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
+    "limit": 10,
+    "filter": {
+      "must": [
+        {
+          "key": "category",
+          "match": {
+            "value": "Music"
+          }
+        },
+        {
+          "key": "tags",
+          "match": {
+            "value": "80s"
+          }
+        }
+      ]
+    }
+  }'
+```
+
 ## Podsumowanie
 
 Ten tutorial przedstawił krok po kroku, jak używać API Qdrant za pomocą komend curl. Nauczyłeś się, jak skonfigurować Qdrant lokalnie, autoryzować się za pomocą kluczy API, korzystać z kluczowych endpointów do tworzenia kolekcji, dodawania punktów, wyszukiwania i innych operacji. Dodatkowo, możesz używać interfejsu webowego do interaktywnego zarządzania danymi.
+
+W praktycznym przykładzie pokazaliśmy, jak utworzyć kolekcję do przechowywania transkrypcji filmów z YouTube, dodać przykładowy punkt i wykonać wyszukiwanie semantyczne z filtrowaniem.
 
 Dla bardziej zaawansowanych przypadków użycia, takich jak wdrożenia rozproszone czy optymalizacja wydajności, zapoznaj się z oficjalną dokumentacją Qdrant.
