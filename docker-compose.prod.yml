@@ -2,21 +2,27 @@ version: '3.8'
 
 services:
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.14.0
     expose:
       - "6333"
     environment:
       - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY}
       # No need for ALLOW_API_KEY_INSECURE in prod since we use HTTPS
-      - QDRANT__SERVICE__HTTP_ALLOW_ORIGIN="*"
+      # CORS is handled by the Caddy reverse proxy
     volumes:
       - prod_qdrant_storage:/qdrant/storage
     networks:
       - qdrant_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   caddy:
-    image: caddy:alpine
+    image: caddy:2.10.0-alpine
     ports:
       - "80:80"
       - "443:443"
@@ -35,6 +41,12 @@ services:
       - DOMAIN=${DOMAIN}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 networks:
   qdrant_network:

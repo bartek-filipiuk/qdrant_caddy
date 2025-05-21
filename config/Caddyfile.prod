@@ -16,21 +16,19 @@
 
     # Simple reverse proxy for all routes
     reverse_proxy qdrant:6333 {
-        # Forward API key in multiple formats to ensure compatibility
+        # Set default api-key from environment. This will be overridden by client-sent headers below if they exist.
         header_up api-key {$QDRANT_API_KEY}
-        header_up x-api-key {$QDRANT_API_KEY}
-        header_up API-KEY {$QDRANT_API_KEY}
-        header_up X-API-KEY {$QDRANT_API_KEY}
-        
-        # Also pass through any client-provided API key headers
-        header_up api-key {http.request.header.X-API-KEY}
-        header_up api-key {http.request.header.API-KEY}
-        header_up api-key {http.request.header.Api-Key}
-        
+        # If client sends 'api-key' (case-insensitive), use its value for the 'api-key' header to Qdrant.
+        header_up api-key {http.request.header.api-key}
+        # If client sends 'X-API-Key' (case-insensitive), use its value for the 'api-key' header to Qdrant.
+        # This will override the previous line if 'X-API-Key' is present.
+        header_up api-key {http.request.header.X-API-Key}
+
         # Enable CORS for browser requests
+        # Consider restricting Access-Control-Allow-Origin to specific domains if possible
         header_down Access-Control-Allow-Origin "*"
         header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-        header_down Access-Control-Allow-Headers "Content-Type, X-API-KEY, API-KEY, api-key"
+        header_down Access-Control-Allow-Headers "Content-Type, api-key, X-API-Key"
         
         # Enable streaming for better performance
         transport http {
