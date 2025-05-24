@@ -58,5 +58,7 @@ Detailed instructions can be found in `docs/DEPLOYMENT.md`.
 
 ## Documentation
 
+- `docs/FAQ.md` - Frequently Asked Questions (password management, authentication, etc.)
 - `docs/Troubleshooting.md` - Troubleshooting guide
-- `docs/Tutorial korzystania z API Qdrant.md` - API usage examples
+- `docs/Tutorial korzystania z API Qdrant.md` - API usage examples (Polish)
+- `docs/Qdrant API Tutorial.md` - API usage examples (English)

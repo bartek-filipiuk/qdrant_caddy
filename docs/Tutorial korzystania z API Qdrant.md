@@ -208,9 +208,9 @@ Poniżej przedstawiamy kompletny przykład utworzenia kolekcji do przechowywania
 
 ```bash
 curl -X PUT 'https://quadro.run/collections/youtube_transcripts' \
-  -u admin:I8GXa8NzFbdP720f \
+  -u admin:xxx \
   -H 'Content-Type: application/json' \
-  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -H 'api-key: xxx' \
   -d '{
     "vectors": {
       "size": 1536,
@@ -227,9 +227,9 @@ curl -X PUT 'https://quadro.run/collections/youtube_transcripts' \
 
 ```bash
 curl -X PUT 'https://quadro.run/collections/youtube_transcripts/points' \
-  -u admin:I8GXa8NzFbdP720f \
+  -u admin:xxx \
   -H 'Content-Type: application/json' \
-  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -H 'api-key: xxx' \
   -d '{
     "points": [
       {
@@ -256,9 +256,9 @@ curl -X PUT 'https://quadro.run/collections/youtube_transcripts/points' \
 
 ```bash
 curl -X POST 'https://quadro.run/collections/youtube_transcripts/points/search' \
-  -u admin:I8GXa8NzFbdP720f \
+  -u admin:xxx \
   -H 'Content-Type: application/json' \
-  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -H 'api-key: xxx' \
   -d '{
     "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
     "limit": 5,
@@ -279,9 +279,9 @@ curl -X POST 'https://quadro.run/collections/youtube_transcripts/points/search' 
 
 ```bash
 curl -X POST 'https://quadro.run/collections/youtube_transcripts/points/search' \
-  -u admin:I8GXa8NzFbdP720f \
+  -u admin:xxx \
   -H 'Content-Type: application/json' \
-  -H 'api-key: Ksv7VnC91D675k78XAEimJArCEUpcZKx' \
+  -H 'api-key: xxx' \
   -d '{
     "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
     "limit": 10,
