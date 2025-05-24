@@ -73,7 +73,7 @@ Caddy automatycznie uzyska certyfikat SSL z Let's Encrypt, co może zająć kilk
 Aby sprawdzić, czy API Qdrant działa poprawnie, wykonaj następujące zapytanie:
 
 ```bash
-curl -s -X GET -u admin:silne_haslo -H "X-API-KEY: twoj_tajny_klucz_api" https://twoja-domena.pl/collections
+curl -s -X GET -u admin:silne_haslo -H "api-key: twoj_tajny_klucz_api" https://twoja-domena.pl/collections
 ```
 
 Powinieneś otrzymać odpowiedź JSON z listą kolekcji.

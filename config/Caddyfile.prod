@@ -16,21 +16,16 @@
 
     # Simple reverse proxy for all routes
     reverse_proxy qdrant:6333 {
-        # Forward API key in multiple formats to ensure compatibility
+        # Forward API key in the format expected by Qdrant
         header_up api-key {$QDRANT_API_KEY}
-        header_up x-api-key {$QDRANT_API_KEY}
-        header_up API-KEY {$QDRANT_API_KEY}
-        header_up X-API-KEY {$QDRANT_API_KEY}
         
-        # Also pass through any client-provided API key headers
-        header_up api-key {http.request.header.X-API-KEY}
-        header_up api-key {http.request.header.API-KEY}
-        header_up api-key {http.request.header.Api-Key}
+        # Also pass through any client-provided API key in standard format
+        header_up api-key {http.request.header.api-key}
         
         # Enable CORS for browser requests
         header_down Access-Control-Allow-Origin "*"
         header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-        header_down Access-Control-Allow-Headers "Content-Type, X-API-KEY, API-KEY, api-key"
+        header_down Access-Control-Allow-Headers "Content-Type, api-key"
         
         # Enable streaming for better performance
         transport http {

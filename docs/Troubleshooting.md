@@ -26,15 +26,21 @@ This document describes common issues encountered when setting up Qdrant with Ca
 **Issue**: 401 Unauthorized errors with message: `Must provide an API key or an Authorization bearer token` when accessing Qdrant API endpoints.
 
 **Solution**:
-1. Qdrant expects the API key in the `api-key` header (lowercase with hyphen), not in the `X-API-KEY` header (uppercase with underscores) that Caddy is configured to check.
-2. Add header forwarding in the Caddyfile to translate between the two formats:
+1. Qdrant expects the API key in the `api-key` header (lowercase with hyphen). Make sure you're using the correct header format in your requests.
+2. Ensure your API key is correctly set in the `.env` file and that Caddy is forwarding it properly:
    ```
    reverse_proxy qdrant:6333 {
      # Forward API key in the correct format
-     header_up api-key {http.request.header.X-API-KEY}
+     header_up api-key {$QDRANT_API_KEY}
    }
    ```
-3. This configuration allows clients to use `X-API-KEY` header, which Caddy validates, and then forwards it to Qdrant as `api-key`.
+3. When making API requests, use the `api-key` header format as shown in the example below:
+   ```bash
+   curl -X GET 'https://your-domain.com/collections' \
+     -u admin:your_password \
+     -H 'Content-Type: application/json' \
+     -H 'api-key: your_api_key'
+   ```
 
 ## Configuration Issues
 
@@ -80,11 +86,11 @@ To verify that your setup is working correctly:
 When testing manually, remember to include both Basic Auth and the API Key:
 
 ```bash
-curl -u admin:haslo123 -H "X-API-KEY: tajny_klucz_123" http://localhost:8080/collections
+curl -u admin:haslo123 -H "api-key: tajny_klucz_123" http://localhost:8080/collections
 ```
 
 For operations that modify data, include the Content-Type header:
 
 ```bash
-curl -X PUT -u admin:haslo123 -H "X-API-KEY: tajny_klucz_123" -H "Content-Type: application/json" -d '{...}' http://localhost:8080/collections/my_collection
+curl -X PUT -u admin:haslo123 -H "api-key: tajny_klucz_123" -H "Content-Type: application/json" -d '{...}' http://localhost:8080/collections/my_collection
 ```
