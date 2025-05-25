@@ -66,7 +66,7 @@ Qdrant offers a REST API for interacting with the database. Below are the key en
     -H 'api-key: secret_key_123' \
     -d '{
       "vectors": {
-        "size": 128,
+        "size": 1536,
         "distance": "Cosine"
       },
       "optimizers_config": {
@@ -93,12 +93,12 @@ Qdrant offers a REST API for interacting with the database. Below are the key en
       "points": [
         {
           "id": 1,
-          "vector": [0.1, 0.2, 0.3, 0.4],
+          "vector": [0.1, 0.2, 0.3, 0.4, /* ... more values to complete 1536 dimensions ... */],
           "payload": {"city": "Warsaw"}
         },
         {
           "id": 2,
-          "vector": [0.4, 0.5, 0.6, 0.7],
+          "vector": [0.4, 0.5, 0.6, 0.7, /* ... more values to complete 1536 dimensions ... */],
           "payload": {"city": "Krakow"}
         }
       ]
@@ -119,8 +119,9 @@ Qdrant offers a REST API for interacting with the database. Below are the key en
     -H 'Content-Type: application/json' \
     -H 'api-key: secret_key_123' \
     -d '{
-      "vector": [0.2, 0.3, 0.4, 0.5],
+      "vector": [0.2, 0.3, 0.4, 0.5, /* ... more values ... */],
       "limit": 10
+      /* Note: This collection requires 1536-dimensional vectors */
     }'
   ```
 - **Explanation**:
