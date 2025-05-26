@@ -4,28 +4,37 @@
 
 Qdrant to otwartoźródłowa baza danych wektorowych i silnik wyszukiwania wektorowego napisany w języku Rust. Jest przeznaczony do wysokowydajnych aplikacji AI na dużą skalę, szczególnie do wyszukiwania podobieństwa wektorów. Qdrant można zainstalować lokalnie lub na serwerze, a jego API umożliwia przechowywanie, wyszukiwanie i zarządzanie wektorami z dodatkowymi danymi (payload). Od wersji 1.7 Qdrant oferuje również interfejs webowy do łatwiejszej interakcji. Ten tutorial przeprowadzi Cię przez proces konfiguracji Qdrant, autoryzacji w API, korzystania z kluczowych endpointów oraz używania interfejsu webowego.
 
-## Krok 1: Konfiguracja Qdrant
+## Krok 1: Konfiguracja i uruchomienie Qdrant w projekcie
 
-Qdrant można uruchomić lokalnie za pomocą Dockera lub jako plik binarny. W tym tutorialu użyjemy Dockera dla prostoty.
+W tym projekcie Qdrant jest zarządzany za pomocą Docker Compose wraz z serwerem Caddy, który pełni rolę reverse proxy i zapewnia HTTPS w środowisku produkcyjnym. Konfiguracja odbywa się poprzez plik `.env`.
 
-1. **Pobierz obraz Qdrant**:
-   ```bash
-   docker pull qdrant/qdrant
-   ```
+1.  **Przygotowanie pliku konfiguracyjnego**:
+    *   Skopiuj plik `.env.example` do nowego pliku o nazwie `.env` w głównym katalogu projektu:
+        ```bash
+        cp .env.example .env
+        ```
+    *   Otwórz plik `.env` i dostosuj zmienne środowiskowe do swoich potrzeb. Kluczowe zmienne to:
+        *   `ENV`: Ustaw na `local` dla środowiska lokalnego lub `prod` dla produkcyjnego. Domyślnie jest `local`.
+        *   `DOMAIN`: Twoja domena (używana w trybie `prod`), np. `qdrant.twojadomena.com`. Pamiętaj, aby skonfigurować odpowiednie rekordy DNS dla tej domeny, aby wskazywały na adres IP serwera, na którym uruchamiasz projekt.
+        *   `ADMIN_USER`: Nazwa użytkownika do panelu administracyjnego Caddy.
+        *   `ADMIN_PASSWORD`: Hasło dla `ADMIN_USER`. Skrypt `scripts/setup-domain.sh` może pomóc w wygenerowaniu hasha hasła (`ADMIN_PASSWORD_HASH`) dla Caddy, jeśli jest to wymagane.
+        *   `QDRANT_API_KEY`: Klucz API do zabezpieczenia dostępu do Qdrant. Upewnij się, że jest to silny, unikalny klucz.
+        *   `LOCAL_PORT`: Port, na którym Qdrant będzie dostępny lokalnie przez Caddy (używany w trybie `local`), np. `8081`.
+        *   `ADMIN_EMAIL`: Adres email używany przez Caddy do uzyskiwania certyfikatów SSL/TLS od Let's Encrypt (w trybie `prod`).
 
-2. **Uruchom kontener Qdrant**:
-   ```bash
-   docker run -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
-   ```
-   - Komenda uruchamia Qdrant na porcie 6333.
-   - Flaga `-v` montuje lokalny katalog (`qdrant_storage`) do przechowywania danych.
+2.  **Uruchomienie usług**:
+    *   Upewnij się, że masz zainstalowany Docker i Docker Compose.
+    *   W głównym katalogu projektu uruchom skrypt `start.sh`:
+        ```bash
+        ./start.sh
+        ```
+    *   Ten skrypt automatycznie odczyta konfigurację z pliku `.env` i uruchomi odpowiednie kontenery (`qdrant` i `caddy`) za pomocą `docker-compose`. W trybie `prod`, Caddy automatycznie spróbuje uzyskać certyfikat SSL dla Twojej domeny.
 
-3. **Dostęp do interfejsu webowego**:
-   - Po uruchomieniu Qdrant, interfejs webowy jest dostępny pod adresem:
-     ```
-     http://localhost:6333/dashboard
-     ```
-   - Interfejs webowy umożliwia zarządzanie kolekcjami, przeglądanie punktów i wykonywanie wyszukiwań w sposób interaktywny.
+3.  **Dostęp do interfejsu webowego Qdrant**:
+    *   Po pomyślnym uruchomieniu, interfejs webowy Qdrant będzie dostępny pod adresem:
+        *   **Dla środowiska lokalnego (`ENV=local`)**: `http://localhost:LOCAL_PORT/dashboard` (gdzie `LOCAL_PORT` to wartość z pliku `.env`, np. `http://localhost:8081/dashboard`). Dostęp do API Qdrant będzie na `http://localhost:LOCAL_PORT/`.
+        *   **Dla środowiska produkcyjnego (`ENV=prod`)**: `https://DOMAIN/dashboard` (gdzie `DOMAIN` to wartość z pliku `.env`, np. `https://qdrant.twojadomena.com/dashboard`). Dostęp do API Qdrant będzie na `https://DOMAIN/`.
+    *   Interfejs webowy umożliwia zarządzanie kolekcjami, przeglądanie punktów i wykonywanie wyszukiwań w sposób interaktywny. Dostęp do API Qdrant (np. przez `curl` lub klientów programistycznych) będzie wymagał użycia `QDRANT_API_KEY` zdefiniowanego w pliku `.env` jako nagłówka `api-key`.
 
 ## Krok 2: Autoryzacja
 
@@ -234,7 +243,7 @@ curl -X PUT 'https://quadro.run/collections/youtube_transcripts/points' \
     "points": [
       {
         "id": 1,
-        "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
+        "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
         "payload": {
           "video_id": "dQw4w9WgXcQ",
           "title": "Rick Astley - Never Gonna Give You Up",
@@ -260,7 +269,7 @@ curl -X POST 'https://quadro.run/collections/youtube_transcripts/points/search' 
   -H 'Content-Type: application/json' \
   -H 'api-key: xxx' \
   -d '{
-    "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
+    "vector": [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.20],
     "limit": 5,
     "filter": {
       "must": [

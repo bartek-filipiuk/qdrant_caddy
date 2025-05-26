@@ -4,28 +4,37 @@
 
 Qdrant is an open-source vector database and vector similarity search engine written in Rust. It is designed for high-performance AI applications at scale, particularly for vector similarity search. Qdrant can be installed locally or on a server, and its API allows storing, searching, and managing vectors with additional data (payload). Since version 1.7, Qdrant also offers a web interface for easier interaction. This tutorial will guide you through the process of configuring Qdrant, API authorization, using key endpoints, and using the web interface.
 
-## Step 1: Configuring Qdrant
+## Step 1: Configuring and Running Qdrant in the Project
 
-Qdrant can be run locally using Docker or as a binary file. In this tutorial, we'll use Docker for simplicity.
+In this project, Qdrant is managed using Docker Compose along with a Caddy server, which acts as a reverse proxy and provides HTTPS in a production environment. Configuration is done via the `.env` file.
 
-1. **Download the Qdrant image**:
-   ```bash
-   docker pull qdrant/qdrant
-   ```
+1.  **Prepare the configuration file**:
+    *   Copy the `.env.example` file to a new file named `.env` in the project's root directory:
+        ```bash
+        cp .env.example .env
+        ```
+    *   Open the `.env` file and adjust the environment variables to your needs. Key variables are:
+        *   `ENV`: Set to `local` for a local environment or `prod` for production. Defaults to `local`.
+        *   `DOMAIN`: Your domain (used in `prod` mode), e.g., `qdrant.yourdomain.com`. Remember to configure the appropriate DNS records for this domain to point to the IP address of the server where you are running the project.
+        *   `ADMIN_USER`: Username for the Caddy admin panel.
+        *   `ADMIN_PASSWORD`: Password for `ADMIN_USER`. The `scripts/setup-domain.sh` script can help generate a password hash (`ADMIN_PASSWORD_HASH`) for Caddy if required.
+        *   `QDRANT_API_KEY`: API key to secure access to Qdrant. Ensure it is a strong, unique key.
+        *   `LOCAL_PORT`: Port on which Qdrant will be available locally via Caddy (used in `local` mode), e.g., `8081`.
+        *   `ADMIN_EMAIL`: Email address used by Caddy to obtain SSL/TLS certificates from Let's Encrypt (in `prod` mode).
 
-2. **Run the Qdrant container**:
-   ```bash
-   docker run -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
-   ```
-   - This command runs Qdrant on port 6333.
-   - The `-v` flag mounts a local directory (`qdrant_storage`) for data storage.
+2.  **Start the services**:
+    *   Ensure you have Docker and Docker Compose installed.
+    *   In the project's root directory, run the `start.sh` script:
+        ```bash
+        ./start.sh
+        ```
+    *   This script will automatically read the configuration from the `.env` file and start the appropriate containers (`qdrant` and `caddy`) using `docker-compose`. In `prod` mode, Caddy will automatically try to obtain an SSL certificate for your domain.
 
-3. **Access the web interface**:
-   - After running Qdrant, the web interface is available at:
-     ```
-     http://localhost:6333/dashboard
-     ```
-   - The web interface allows you to manage collections, browse points, and perform searches interactively.
+3.  **Accessing the Qdrant web interface**:
+    *   After successful startup, the Qdrant web interface will be available at:
+        *   **For local environment (`ENV=local`)**: `http://localhost:LOCAL_PORT/dashboard` (where `LOCAL_PORT` is the value from the `.env` file, e.g., `http://localhost:8081/dashboard`). Qdrant API access will be at `http://localhost:LOCAL_PORT/`.
+        *   **For production environment (`ENV=prod`)**: `https://DOMAIN/dashboard` (where `DOMAIN` is the value from the `.env` file, e.g., `https://qdrant.yourdomain.com/dashboard`). Qdrant API access will be at `https://DOMAIN/`.
+    *   The web interface allows managing collections, browsing points, and performing searches interactively. Accessing the Qdrant API (e.g., via `curl` or programming clients) will require using the `QDRANT_API_KEY` defined in the `.env` file as an `api-key` header.
 
 ## Step 2: Authorization
 
