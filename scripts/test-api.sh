@@ -7,8 +7,8 @@
 # Set variables
 HOST="localhost:8443"
 USERNAME="admin"
-PASSWORD="I8GXa8NzFbdP720f"
-API_KEY="Ksv7VnC91D675k78XAEimJArCEUpcZKx"
+PASSWORD="zupa"
+API_KEY="pomidorowa"
 INSECURE="-k" # Skip SSL verification for self-signed certificates
 TEST_COLLECTION="test_collection_$(date +%s)" # Unique collection name with timestamp
 
