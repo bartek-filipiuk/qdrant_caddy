@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    expose:
+      - "6333"
+    environment:
+      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY}
+      # No need for ALLOW_API_KEY_INSECURE in prod since we use HTTPS
+      - QDRANT__SERVICE__HTTP_ALLOW_ORIGIN="*"
+    volumes:
+      - prod_qdrant_storage:/qdrant/storage
+    networks:
+      - qdrant_network
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/Caddyfile.prod:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - qdrant
+    networks:
+      - qdrant_network
+    environment:
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      - DOMAIN=${DOMAIN}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+    restart: unless-stopped
+
+networks:
+  qdrant_network:
+    driver: bridge
+
+volumes:
+  prod_qdrant_storage:
+  caddy_data:
+  caddy_config:

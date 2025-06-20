@@ -1,0 +1,28 @@
+# Single endpoint with HTTPS
+localhost:8080 {
+    tls internal
+    
+    # Basic Auth for all routes
+    basic_auth {
+        admin $2a$14$3RaT2L90ezuuLJYPuynrlelHOTYvHZZE6VgwwrWMtmDSbs8B615Om
+    }
+
+    # Simple reverse proxy for all routes
+    reverse_proxy qdrant:6333 {
+        # Forward API key in the correct format
+        header_up api-key {http.request.header.X-API-KEY}
+        # Enable streaming for better performance
+        transport http {
+            response_header_timeout 5m
+            read_timeout 5m
+            write_timeout 5m
+        }
+    }
+    
+    # Logging
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}

@@ -1,0 +1,44 @@
+{$DOMAIN} {
+    # TLS with automatic HTTPS using Let's Encrypt with HTTP-01 challenge only
+    tls {
+        issuer acme {
+            email {$ADMIN_EMAIL}
+            preferred_chains smallest
+            # Disable TLS-ALPN challenge, forcing HTTP-01 only
+            disable_tlsalpn_challenge
+        }
+    }
+
+    # Basic Auth for all routes
+    basic_auth {
+        {$ADMIN_USER} {$ADMIN_PASSWORD_HASH}
+    }
+
+    # Simple reverse proxy for all routes
+    reverse_proxy qdrant:6333 {
+        # Forward API key in the format expected by Qdrant
+        header_up api-key {$QDRANT_API_KEY}
+        
+        # Also pass through any client-provided API key in standard format
+        header_up api-key {http.request.header.api-key}
+        
+        # Enable CORS for browser requests
+        header_down Access-Control-Allow-Origin "*"
+        header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        header_down Access-Control-Allow-Headers "Content-Type, api-key"
+        
+        # Enable streaming for better performance
+        transport http {
+            response_header_timeout 5m
+            read_timeout 5m
+            write_timeout 5m
+        }
+    }
+    
+    # Logging
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}
